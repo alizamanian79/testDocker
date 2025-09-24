@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: sodor24_db
+    environment:
+      POSTGRES_DB: sodor24db
+      POSTGRES_USER: sodor24
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  spring-app:
+    build: .
+    container_name: sodor24_app
+    depends_on:
+      - db
+    ports:
+      - "8181:8181"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sodor24db
+      - SPRING_DATASOURCE_USERNAME=sodor24
+      - SPRING_DATASOURCE_PASSWORD=1234
+    restart: unless-stopped
+
+volumes:
+  db_data:
